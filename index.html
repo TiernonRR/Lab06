@@ -21,18 +21,13 @@
      <p>More words.</p>
      <a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a>
 
-     <div class="container">
-       <div id="numStop">
-         <input v-model.number="numStops" type="number">
-      </div>
-     </div>
-
    </div>
    <div class="container">
-     <div id="filteredStops">
+     <div id="app">
+       <input v-model.number="numStops" type="number">
        <ol>
-        <li v-for="stop in stops">
-          {{ stop.text }}
+        <li v-for="(stop, stopID) in stops">
+          {{ filteredStops }}
         </li>
       </ol>
     </div>
@@ -55,20 +50,23 @@
    ></script>
    <script>
    const app = new Vue({
-     el: '#filteredStops',
+     el: '#app',
      data: {
-       stops: []
+       stops: [],
+       numStops: 10
      },
      mounted: function(){
        fetch('https://utils.pauliankline.com/stops.json')
        .then(function(response) {
           return response.json();
         })
-        .then(function(myJson){});
+        .then(function(myJson) {
+          this.stops = JSON.stringify(myJson);
+        });
      },
      computed:{
-       filterStops: function(){
-         for(let i=0;)
+       filteredStops: function(){
+          return(this.stops.slice(0, numStops));
        }
      }
 
