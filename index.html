@@ -27,7 +27,7 @@
        <input v-model.number="numStops" type="number">
        <ol>
         <li v-for="(stop, stopID) in stops">
-          {{ filteredStops }}
+          {{ stop }}
         </li>
       </ol>
     </div>
@@ -65,9 +65,15 @@
         });
      },
      computed:{
-       filteredStops: function(){
-          return(this.stops.slice(0, numStops));
-       }
+       filteredStops: {
+          get:function(){
+            return(this.stops.slice(0, numStops));
+          },
+          set: function(newValue){
+            let newStops = newValue;
+            stops = newStops;
+          }
+      }
      }
 
    })
