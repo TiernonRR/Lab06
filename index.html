@@ -14,21 +14,30 @@
  </head>
  <body>
 
-   <div class="jumbotron">
+   <!-- <div class="jumbotron">
      <h1 class="display-4">Hello, world!</h1>
      <p class="lead">Dummy Text</p>
      <hr class="my-4">
      <p>More words.</p>
      <a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a>
+   </div> -->
 
-   </div>
    <div class="container">
      <div id="app">
-       <input v-model.number="numStops" type="number">
+       <input v-model.number="numStops" type="number"/>
        <ol>
-        <li v-for="(stop, stopID) in stops">
-          {{ stop }}
+        <template v-for="stop in filteredStops">
+        <li>
+          <div class="card" style="width: 18rem;">
+            <img src="..." class="card-img-top" alt="...">
+            <div class="card-body">
+              <h5 class="card-title">{{ stop.name }}</h5>
+              <p class="card-text">{{ stop.description }}</p>
+              <a href="#" class="btn btn-primary">Go somewhere</a>
+            </div>
+          </div>
         </li>
+        </template>
       </ol>
     </div>
    </div>
@@ -53,26 +62,21 @@
      el: '#app',
      data: {
        stops: [],
-       numStops: 10
+       numStops: 10,
      },
-     mounted: function(){
-       fetch('https://utils.pauliankline.com/stops.json')
-       .then(function(response) {
-          return response.json();
-        })
-        .then(function(myJson) {
-          this.stops = JSON.stringify(myJson);
-        });
-     },
+     mounted: 
+         function(){
+          fetch('https://utils.pauliankline.com/stops.json')
+          .then(function(response) {
+             return response.json();
+           })
+           .then(function(myJson) {
+             this.stops = myJson;
+           });
+      },
      computed:{
-       filteredStops: {
-          get:function(){
-            return(this.stops.slice(0, numStops));
-          },
-          set: function(newValue){
-            let newStops = newValue;
-            stops = newStops;
-          }
+       filteredStops: function(){
+          return((this.stops).slice(0, this.numStops));
       }
      }
 
