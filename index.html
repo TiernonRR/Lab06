@@ -62,7 +62,7 @@
      el: '#app',
      data: {
        stops: [],
-       numStops: 10,
+       numStops: 10
      },
      mounted: 
          function(){
@@ -72,15 +72,16 @@
            })
            .then(function(myJson) {
              this.stops = myJson;
+             console.log(this.stops);
            });
-      },
+          },
      computed:{
-       filteredStops: function(){
-          return((this.stops).slice(0, this.numStops));
+       filteredStops: function () {
+         console.log(this.stops);
+         return (this.stops.slice(0, this.numStops));
+         }
       }
-     }
-
-   })
+     })
    </script>
  </body>
 </html>
