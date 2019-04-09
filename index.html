@@ -29,11 +29,10 @@
         <template v-for="stop in filteredStops">
         <li>
           <div class="card" style="width: 18rem;">
-            <img src="..." class="card-img-top" alt="...">
             <div class="card-body">
               <h5 class="card-title">{{ stop.name }}</h5>
               <p class="card-text">{{ stop.description }}</p>
-              <a href="#" class="btn btn-primary">Go somewhere</a>
+              <p class="card-text"> You are {{stop.distance}} m away</p>
             </div>
           </div>
         </li>
@@ -58,11 +57,20 @@
      crossorigin="anonymous"
    ></script>
    <script>
+     function getPos(){
+          navigator.geolocation.getCurrentPosition(function(position) {
+              app.userPos[0] = (position.coords.latitude); 
+              app.userPos[1] = (position.coords.longitude);
+          });
+     }
+     getPos();
+
    const app = new Vue({
      el: '#app',
      data: {
        stops: [],
-       numStops: 10
+       numStops: 10,
+       userPos: []
      },
      mounted: 
          function(){
@@ -70,15 +78,38 @@
           .then(function(response) {
              return response.json();
            })
-           .then(function(myJson) {
+           .then((myJson) => {
              this.stops = myJson;
-             console.log(this.stops);
            });
+
           },
      computed:{
        filteredStops: function () {
-         console.log(this.stops);
-         return (this.stops.slice(0, this.numStops));
+          function findDistance(){
+              //modified from https://www.movable-type.co.uk/scripts/latlong.html
+              for(let stop in this.stops){
+                  let meter   = 6371e3;
+                  let angle1  = this.userPos[0].toRadians();
+                  let andgle2 = this.stop.lat.toRadians();
+                  let changeLat = (this.stop.lat - this.userPos[0]).toRadians();
+                  let changeLon = (this.stop.lon - this.userPos[1]).toRadians();
+
+                  let a = Math.sin(changeLat/2) * Math.sin(changeLat/2) + 
+                          Math.cos(angle1) * Math.cos(angle2) * Math.sin(changeLon/2) * Math.sin(changeLon/2);
+                  let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+                  stop.distance = meter * c;
+              }
+          }
+          
+          let watchID = navigator.geolocation.watchPosition(function(position) {
+            findDistance(position.coords.latitude, position.coords.longitude);
+          });
+
+          this.stops.sort(function(a,b){
+              return(a.distance - b.distance);
+          });
+          return (this.stops.slice(0, this.numStops));
          }
       }
      })
