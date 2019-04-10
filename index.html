@@ -59,11 +59,10 @@
    <script>
      function getPos(){
           navigator.geolocation.getCurrentPosition(function(position) {
-              app.userPos[0] = (position.coords.latitude); 
+              app.userPos[0] = (position.coords.latitude);
               app.userPos[1] = (position.coords.longitude);
           });
      }
-     getPos();
 
    const app = new Vue({
      el: '#app',
@@ -72,43 +71,63 @@
        numStops: 10,
        userPos: []
      },
-     mounted: 
+     mounted:
          function(){
+          getPos();
           fetch('https://utils.pauliankline.com/stops.json')
           .then(function(response) {
              return response.json();
            })
            .then((myJson) => {
              this.stops = myJson;
-           });
 
+             for(let i=0; i < this.stops.length; i++){
+                 let meter   = 6371e3;
+                 let angle1  = toRadians(this.userPos[0]);
+                 let angle2 = toRadians(this.stops[i].lat);
+                 let changeLat = toRadians(this.stops[i].lat - this.userPos[0]);
+                 let changeLon = toRadians(this.stops[i].lon - this.userPos[1]);
+
+                 let a = Math.sin(changeLat/2) * Math.sin(changeLat/2) +
+                         Math.cos(angle1) * Math.cos(angle2) * Math.sin(changeLon/2) * Math.sin(changeLon/2);
+                 let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+                 this.stops[i].distance = Math.round(meter * c);
+             }
+
+             function toRadians(deg){
+                return deg * (Math.PI/180);
+             }
+
+           });
           },
      computed:{
        filteredStops: function () {
-          function findDistance(){
+          function findDistance(x,y){
               //modified from https://www.movable-type.co.uk/scripts/latlong.html
               for(let stop in this.stops){
                   let meter   = 6371e3;
-                  let angle1  = this.userPos[0].toRadians();
-                  let andgle2 = this.stop.lat.toRadians();
-                  let changeLat = (this.stop.lat - this.userPos[0]).toRadians();
-                  let changeLon = (this.stop.lon - this.userPos[1]).toRadians();
+                  let angle1  = toRadians(x);
+                  let angle2 = toRadians(this.stop.lat);
+                  let changeLat = toRadians(this.stop.lat - x);
+                  let changeLon = toRadians(this.stop.lon - y);
 
-                  let a = Math.sin(changeLat/2) * Math.sin(changeLat/2) + 
+                  let a = Math.sin(changeLat/2) * Math.sin(changeLat/2) +
                           Math.cos(angle1) * Math.cos(angle2) * Math.sin(changeLon/2) * Math.sin(changeLon/2);
                   let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+                  console.log(stop)
+                  stop.distance = Math.round(meter * c);
+              }
 
-                  stop.distance = meter * c;
+              function toRadians(deg){
+                 return deg * (Math.PI/180);
               }
           }
-          
+
           let watchID = navigator.geolocation.watchPosition(function(position) {
             findDistance(position.coords.latitude, position.coords.longitude);
-          });
+          })
 
-          this.stops.sort(function(a,b){
-              return(a.distance - b.distance);
-          });
+          this.stops.sort(function(a,b){return(a.distance - b.distance)})
           return (this.stops.slice(0, this.numStops));
          }
       }
