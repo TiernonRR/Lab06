@@ -96,12 +96,12 @@
        filteredStops: function () {
           function findDistance(x,y){
               //modified from https://www.movable-type.co.uk/scripts/latlong.html
-              for(let i=0; i < this.stops.length; i++){
+              for(let stop in this.stops){
                   let meter   = 6371e3;
                   let angle1  = toRadians(x);
-                  let angle2 = toRadians(this.stops[i].lat);
-                  let changeLat = toRadians(this.stops[i].lat - x);
-                  let changeLon = toRadians(this.stops[i].lon - y);
+                  let angle2 = toRadians(stop.lat);
+                  let changeLat = toRadians(stop.lat - x);
+                  let changeLon = toRadians(stop.lon - y);
 
                   let a = Math.sin(changeLat/2) * Math.sin(changeLat/2) +
                           Math.cos(angle1) * Math.cos(angle2) * Math.sin(changeLon/2) * Math.sin(changeLon/2);
