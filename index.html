@@ -14,14 +14,6 @@
  </head>
  <body>
 
-   <!-- <div class="jumbotron">
-     <h1 class="display-4">Hello, world!</h1>
-     <p class="lead">Dummy Text</p>
-     <hr class="my-4">
-     <p>More words.</p>
-     <a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a>
-   </div> -->
-
    <div class="container">
      <div id="app">
        <input v-model.number="numStops" type="number"/>
@@ -104,18 +96,17 @@
        filteredStops: function () {
           function findDistance(x,y){
               //modified from https://www.movable-type.co.uk/scripts/latlong.html
-              for(let stop in this.stops){
+              for(let i=0; i < this.stops.length; i++){
                   let meter   = 6371e3;
                   let angle1  = toRadians(x);
-                  let angle2 = toRadians(this.stop.lat);
-                  let changeLat = toRadians(this.stop.lat - x);
-                  let changeLon = toRadians(this.stop.lon - y);
+                  let angle2 = toRadians(this.stops[i].lat);
+                  let changeLat = toRadians(this.stops[i].lat - x);
+                  let changeLon = toRadians(this.stops[i].lon - y);
 
                   let a = Math.sin(changeLat/2) * Math.sin(changeLat/2) +
                           Math.cos(angle1) * Math.cos(angle2) * Math.sin(changeLon/2) * Math.sin(changeLon/2);
                   let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-                  console.log(stop)
-                  stop.distance = Math.round(meter * c);
+                  this.stops[i].distance = Math.round(meter * c);
               }
 
               function toRadians(deg){
